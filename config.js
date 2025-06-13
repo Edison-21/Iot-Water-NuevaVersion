@@ -1,0 +1,1 @@
+API_AUTH = 'https://tu-api.com/api/';
