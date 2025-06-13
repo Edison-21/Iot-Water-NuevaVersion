@@ -12,8 +12,6 @@ import Dashboard        from "../views/Dashboard.vue";
 import Gateway          from "../views/Gateway.vue";
 import Usuario          from "../views/Usuario.vue";
 import Medidor          from "../views/Medidor.vue";
-import Cliente          from "../views/Cliente.vue";
-import Crm              from "../views/Crm.vue";
 
 // ----> Nuevas vistas
 import Denuncias        from "../views/Denuncias.vue";
@@ -34,8 +32,6 @@ const routes = [
       { path: "gateway",            name: "Gateway",          component: Gateway },
       { path: "usuario",            name: "Usuario",          component: Usuario },
       { path: "medidor",            name: "Medidor",          component: Medidor },
-      { path: "cliente",            name: "Cliente",          component: Cliente },
-      { path: "crm",                name: "Crm",              component: Crm },
       // ----> Aquí agregamos las nuevas secciones
       { path: "denuncias",          name: "Denuncias",        component: Denuncias },
       { path: "gestion-problemas",  name: "GestionProblemas", component: GestionProblemas },

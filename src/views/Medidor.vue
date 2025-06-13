@@ -1,431 +1,424 @@
 <template>
-  <div class="content">
-    <!-- Encabezado y botón para abrir el modal del formulario -->
-    <div class="header-container">
-      <h1>Medidores</h1>
-      <div class="user-info">
-        <span>Usuario Admin</span>
+  <div class="bg-app">
+    <!-- CONTENIDO -->
+    <div class="denuncias-container">
+      <div class="denuncias-header mb-3">
+        <div>
+          <h2 class="denuncias-title">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Denuncias Administrativas - Sistema de Agua e IoT
+          </h2>
+          <div class="denuncias-subtitle">
+            Gestión interna de incidencias relacionadas con el sistema de agua, dispositivos IoT o problemas de medición.
+          </div>
+        </div>
       </div>
-      <div>
-        <button @click="showAddForm" class="add-button">Añadir Medidor</button>
-      </div>
-    </div>
-    <!-- agregar y editar medidores -->
-    <div class="form-container" v-if="showForm">
-      <h2 class="title2">{{ editing ? "Editar " : "Agregar " }} Medidor</h2>
-      <form @submit.prevent="submitForm" class="form-principal">
-        <div class="inf">
-          <div class="form-group">
-            <label for="meterId" class="title">ID del Medidor</label>
-            <input type="number" id="meterId" v-model="currentMeter.idMeter" />
+      <div class="denuncias-content">
+        <!-- GRAFICOS -->
+        <section class="chart-section mb-4">
+          <div class="row">
+            <div class="col-md-6 mb-4 mb-md-0">
+              <div class="chart-wrapper">
+                <h5 class="chart-title">Tipos de Incidencias</h5>
+                <div class="chart-container">
+                  <canvas id="graficoTorta"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="chart-wrapper">
+                <h5 class="chart-title">Estado de Incidencias</h5>
+                <div class="chart-container">
+                  <canvas id="graficoBarras"></canvas>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="meterName" class="title">Codigo </label>
-            <input type="number" id="meterName" v-model="currentMeter.name" />
-          </div>
-          <div class="form-group">
-            <label for="meterLocation" class="title">Ubicación</label>
-            <input
-              type="text"
-              id="meterLocation"
-              v-model="currentMeter.location"
-            />
-          </div>
-          <div class="form-group">
-            <label for="meterType" class="title">Modelo</label>
-            <input type="text" id="meterType" v-model="currentMeter.type" />
-          </div>
-          <div class="form-group">
-            <label for="id_cliente" class="title">id_cliente</label>
-            <input
-              type="number"
-              id="id_cliente"
-              v-model="currentMeter.id_cliente"
-            />
-          </div>
-          <div class="form-group">
-            <label for="id_gateway" class="title">id_gateway</label>
-            <input
-              type="number"
-              id="id_gateway"
-              v-model="currentMeter.id_gateway"
-            />
-          </div>
-          <div class="form-group">
-            <label for="estado" class="title">estado</label>
-            <input type="text" id="estado" v-model="currentMeter.estado" />
-          </div>
-          <div class="form-group">
-            <label for="fecha" class="title">fecha de instalacion</label>
-            <input
-              type="text"
-              id="fecha"
-              v-model="currentMeter.fecha_instalacion"
-            />
-          </div>
-          <div class="form-buttons">
-            <button type="submit" class="btn btn-primary">
-              {{ editing ? "Guardar" : "Agregar" }}
-            </button>
-            <button type="button" @click="cancelEdit" class="btn btn-secondary">
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-    <!-- tabla de medidores -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>ID del Medidor</th>
-            <th>Codigo</th>
-            <th>Ubicación</th>
-            <th>Modelo</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="meter in meters" :key="meter.idMeter">
-            <td>{{ meter.idMeter }}</td>
-            <td>{{ meter.name }}</td>
-            <td>{{ meter.location }}</td>
-            <td>{{ meter.type }}</td>
-            <td>{{ meter.estado }}</td>
-            <td class="actions">
-              <i class="fas fa-eye" @click="viewDetails(meter.idMeter)"></i>
-              <i class="fas fa-edit" @click="editMeter(meter.idMeter)"></i>
-              <i
-                class="fas fa-trash-alt"
-                @click="confirmDelete(meter.idMeter)"
-              ></i>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+        </section>
 
-    <!-- Modal para el formulario de agregar/editar -->
-    <Modal
-      v-if="showFormModal"
-      :show="showFormModal"
-      :title="editing ? 'Editar Medidor' : 'Agregar Medidor'"
-      @cancel="closeFormModal"
-    >
-      <form @submit.prevent="submitForm" class="form-principal">
-        <div class="form-group">
-          <label for="name">Codigo del medidor</label>
-          <input
-            type="number"
-            id="name"
-            v-model="currentMeter.name"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="location">Ubicación</label>
-          <input
-            type="text"
-            id="location"
-            v-model="currentMeter.location"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="type">Modelo</label>
-          <input
-            type="number"
-            id="type"
-            v-model="currentMeter.type"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="type">id del cliente</label>
-          <input
-            type="number"
-            id="type"
-            v-model="currentMeter.id_cliente"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="type">id del gateway</label>
-          <input
-            type="number"
-            id="type"
-            v-model="currentMeter.id_gateway"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="estado">estado</label>
-          <select
-            name="estado"
-            id="estado"
-            v-model="currentMeter.estado"
-            class="form-control"
-            required
-          >
-            <option value="activo">activo</option>
-            <option value="inactivo">inactivo</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="type">fecha de instalacion</label>
-          <input
-            type="date"
-            id="type"
-            v-model="currentMeter.fecha_instalacion"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="form-buttons">
-          <button type="submit" class="btn btn-primary">
-            {{ editing ? "Guardar" : "Agregar" }}
-          </button>
-          <button
-            type="button"
-            @click="closeFormModal"
-            class="btn btn-secondary"
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </Modal>
-
-    <!-- Detalle del Medidor -->
-    <div v-if="selectedMeter" class="meter-details-container">
-      <div class="meter-details">
-        <div class="detail-total">
-          <div class="meter-icon">
-            <img src="../assets/meter-icon.png" alt="Ícono de Medidor" />
+        <!-- FORMULARIO SOLO PARA ADMIN SISTEMA DE AGUA E IOT -->
+        <section class="form-section">
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-plus-circle me-2"></i>
+                Registrar Nueva Incidencia
+              </h5>
+            </div>
+            <div class="card-body">
+              <form class="needs-validation" novalidate>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label for="tipoIncidencia" class="form-label">Tipo de Incidencia</label>
+                    <select class="form-select" id="tipoIncidencia" required>
+                      <option value="" selected disabled>Seleccione...</option>
+                      <option value="medidor">Falla en medidor</option>
+                      <option value="fuga">Fuga de agua</option>
+                      <option value="app">Problema con la App</option>
+                      <option value="iot">Desconexión IoT</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="prioridad" class="form-label">Prioridad</label>
+                    <select class="form-select" id="prioridad" required>
+                      <option value="" selected disabled>Seleccione...</option>
+                      <option value="alta">Alta</option>
+                      <option value="media">Media</option>
+                      <option value="baja">Baja</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="descripcion" class="form-label">Descripción detallada</label>
+                  <textarea class="form-control" id="descripcion" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="evidencia" class="form-label">Subir evidencia (opcional)</label>
+                  <input class="form-control" type="file" id="evidencia">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-paper-plane me-2"></i>Enviar Incidencia
+                </button>
+              </form>
+            </div>
           </div>
-          <div class="inf">
-            <h2>Detalle del Medidor</h2>
-            <p><strong>ID del Medidor:</strong> {{ selectedMeter.idMeter }}</p>
-            <p><strong>Codigo</strong> {{ selectedMeter.name }}</p>
-            <p><strong>Ubicación:</strong> {{ selectedMeter.location }}</p>
-            <p><strong>Modelo:</strong> {{ selectedMeter.type }}</p>
-            <p><strong>id_gateway:</strong> {{ selectedMeter.id_gateway }}</p>
-            <p><strong>id_cliente:</strong> {{ selectedMeter.id_cliente }}</p>
-            <p><strong>Estado:</strong> {{ selectedMeter.estado }}</p>
-            <p>
-              <strong>Fecha de instalacion:</strong>
-              {{ selectedMeter.fecha_instalacion }}
-            </p>
-          </div>
+        </section>
 
-          <div class="meter-statistics">
-            <h3>Consumo de Agua</h3>
-            <p><strong>Total Consumido:</strong> {{ consumoTotal }} litros</p>
-            <canvas id="consumptionChart"></canvas>
+        <!-- MIS DENUNCIAS -->
+        <section class="list-section">
+          <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-list me-2"></i>
+                Mis Incidencias Reportadas
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Tipo</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                      <th>Prioridad</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>INC-2023-001</td>
+                      <td>Falla en medidor</td>
+                      <td>15/06/2023</td>
+                      <td><span class="badge bg-warning">En solución</span></td>
+                      <td><span class="badge bg-danger">Alta</span></td>
+                      <td>
+                        <button class="btn btn-sm btn-outline-primary">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>INC-2023-002</td>
+                      <td>Problema con la App</td>
+                      <td>10/06/2023</td>
+                      <td><span class="badge bg-success">Cerrada</span></td>
+                      <td><span class="badge bg-info">Media</span></td>
+                      <td>
+                        <button class="btn btn-sm btn-outline-primary">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>INC-2023-003</td>
+                      <td>Desconexión IoT</td>
+                      <td>05/06/2023</td>
+                      <td><span class="badge bg-primary">Asignada</span></td>
+                      <td><span class="badge bg-warning">Baja</span></td>
+                      <td>
+                        <button class="btn btn-sm btn-outline-primary">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                  </li>
+                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">Siguiente</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
           </div>
-        </div>
-
-        <button @click="selectedMeter = null" class="back-button">
-          Cerrar
-        </button>
+        </section>
       </div>
     </div>
   </div>
 </template>
-<script>
-import Modal from "../components/Modal.vue";
-import Chart from "chart.js/auto";
 
-export default {
-  name: "Meter",
-  components: {
-    Modal,
+<script setup>
+import { onMounted } from 'vue'
+import Chart from 'chart.js/auto'
+
+// Datos para los gráficos
+const chartData = {
+  tiposIncidencia: {
+    labels: ['Falla en medidor', 'Fuga de agua', 'Problema App', 'Desconexión IoT'],
+    data: [5, 3, 2, 4]
   },
-  data() {
-    return {
-      meters: [], // Lista de medidores
-      currentMeter: {
-        idMeter: "",
-        name: "",
-        location: "",
-        type: "",
-        id_cliente: "",
-        id_gateway: "",
-        estado: "",
-        fecha_instalacion: "",
+  estadosIncidencia: {
+    labels: ['Recibidas', 'Asignadas', 'En solución', 'Cerradas'],
+    data: [2, 3, 4, 1]
+  }
+}
+
+// Variables para almacenar las instancias de los gráficos
+let tortaChart = null
+let barrasChart = null
+
+onMounted(() => {
+  renderCharts()
+})
+
+const renderCharts = () => {
+  // Destruir gráficos existentes si los hay
+  if (tortaChart) tortaChart.destroy()
+  if (barrasChart) barrasChart.destroy()
+
+  // Renderizar gráfico de torta
+  const ctxTorta = document.getElementById('graficoTorta')
+  if (ctxTorta) {
+    tortaChart = new Chart(ctxTorta, {
+      type: 'doughnut',
+      data: {
+        labels: chartData.tiposIncidencia.labels,
+        datasets: [{
+          data: chartData.tiposIncidencia.data,
+          backgroundColor: ['#1d39c4', '#cf1322', '#d46b08', '#08979c'],
+          borderWidth: 1
+        }]
       },
-      editing: false,
-      showFormModal: false, // Controla si el modal del formulario está visible
-      selectedMeter: null, // Controla si hay un medidor seleccionado para mostrar detalles
-      consumoMensual: [], // Datos de consumo mensual del medidor seleccionado
-      consumoTotal: 0, // Consumo total del medidor seleccionado
-      consumptionChart: null, // Referencia al gráfico
-    };
-  },
-  created() {
-    this.loadDummyData();
-  },
-  methods: {
-    // Cargar datos predefinidos
-    loadDummyData() {
-      this.meters = [
-        {
-          idMeter: "1",
-          name: "Medidor 1",
-          location: "Zona A",
-          type: "Tipo A",
-          estado: "activo",
-          id_gateway: "23",
-          id_cliente: "21312",
-          fecha_instalacion: "2024-08-09",
-        },
-        {
-          idMeter: "2",
-          name: "Medidor 2",
-          location: "Zona B",
-          type: "Tipo B",
-          estado: "inactivo",
-          id_gateway: "1000",
-          id_cliente: "1000",
-          fecha_instalacion: "2024-08-09",
-        },
-      ];
-    },
-    // Mostrar el modal del formulario para agregar
-    showAddForm() {
-      this.resetForm();
-      this.showFormModal = true;
-    },
-    // Configurar el formulario para editar un Medidor
-    editMeter(id) {
-      this.editing = true;
-      this.currentMeter = {
-        ...this.meters.find((meter) => meter.idMeter === id),
-      };
-      this.showFormModal = true;
-    },
-    // Guardar o agregar un Medidor
-    submitForm() {
-      if (this.editing) {
-        const index = this.meters.findIndex(
-          (meter) => meter.idMeter === this.currentMeter.idMeter
-        );
-        if (index !== -1) this.meters[index] = { ...this.currentMeter };
-      } else {
-        this.currentMeter.idMeter = (this.meters.length + 1).toString();
-        this.meters.push({ ...this.currentMeter });
-      }
-      this.closeFormModal();
-    },
-    // Cerrar el modal del formulario
-    closeFormModal() {
-      this.resetForm();
-      this.showFormModal = false;
-    },
-    // Reiniciar el formulario
-    resetForm() {
-      this.currentMeter = {
-        idMeter: "",
-        name: "",
-        location: "",
-        type: "",
-      };
-      this.editing = false;
-    },
-    // Mostrar detalles de un Medidor y cargar consumo de agua
-    viewDetails(id) {
-      this.selectedMeter = this.meters.find((meter) => meter.idMeter === id);
-
-      if (this.selectedMeter) {
-        // Simulación de consumo mensual para cada medidor
-        this.consumoMensual = Array.from({ length: 12 }, () =>
-          Math.floor(Math.random() * 100 + 50)
-        );
-
-        this.calcularConsumoTotal();
-
-        // Esperar a que Vue actualice el DOM antes de intentar dibujar el gráfico
-        this.$nextTick(() => {
-          this.renderChart();
-        });
-      }
-    },
-    // Confirmar eliminación de un Medidor
-    confirmDelete(id) {
-      this.meters = this.meters.filter((meter) => meter.idMeter !== id);
-    },
-    // Calcular el consumo total
-    calcularConsumoTotal() {
-      this.consumoTotal = this.consumoMensual.reduce(
-        (acc, val) => acc + val,
-        0
-      );
-    },
-    // Renderizar gráfico de consumo
-
-    renderChart() {
-      this.$nextTick(() => {
-        const canvas = document.getElementById("consumptionChart");
-
-        if (!canvas) {
-          console.error("El canvas no se encontró en el DOM.");
-          return;
-        }
-
-        const ctx = canvas.getContext("2d");
-
-        if (this.consumptionChart) {
-          this.consumptionChart.destroy(); // Eliminar gráfico anterior si existe
-        }
-
-        this.consumptionChart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: [
-              "Enero",
-              "Febrero",
-              "Marzo",
-              "Abril",
-              "Mayo",
-              "Junio",
-              "Julio",
-              "Agosto",
-              "Septiembre",
-              "Octubre",
-              "Noviembre",
-              "Diciembre",
-            ],
-            datasets: [
-              {
-                label: "Consumo de Agua (L)",
-                data: this.consumoMensual,
-                borderColor: "blue",
-                backgroundColor: "rgba(0, 123, 255, 0.2)",
-                fill: true,
-              },
-            ],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              boxWidth: 12,
+              font: {
+                size: 12
+              }
+            }
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-              },
-            },
+          tooltip: {
+            enabled: true
+          }
+        },
+        cutout: '65%'
+      }
+    })
+  }
+
+  // Renderizar gráfico de barras
+  const ctxBarras = document.getElementById('graficoBarras')
+  if (ctxBarras) {
+    barrasChart = new Chart(ctxBarras, {
+      type: 'bar',
+      data: {
+        labels: chartData.estadosIncidencia.labels,
+        datasets: [{
+          label: 'Cantidad',
+          data: chartData.estadosIncidencia.data,
+          backgroundColor: '#1890ff',
+          borderColor: '#096dd9',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            display: false 
           },
-        });
-      });
-    },
+          tooltip: {
+            enabled: true
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+              precision: 0
+            }
+          }
+        }
+      }
+    })
+  }
+}
+
+// Resto de la lógica del componente
+const formData = {
+  tipoIncidencia: '',
+  prioridad: '',
+  descripcion: '',
+  evidencia: null
+}
+
+const denuncias = [
+  {
+    id: 'INC-2023-001',
+    tipo: 'Falla en medidor',
+    fecha: '15/06/2023',
+    estado: 'En solución',
+    prioridad: 'Alta'
   },
-};
+  {
+    id: 'INC-2023-002',
+    tipo: 'Problema con la App',
+    fecha: '10/06/2023',
+    estado: 'Cerrada',
+    prioridad: 'Media'
+  },
+  {
+    id: 'INC-2023-003',
+    tipo: 'Desconexión IoT',
+    fecha: '05/06/2023',
+    estado: 'Asignada',
+    prioridad: 'Baja'
+  }
+]
+
+const submitForm = () => {
+  // Lógica para enviar el formulario
+  console.log('Formulario enviado:', formData)
+}
 </script>
 
-<style src="../assets/css/AñadirMedidor.css"></style>
+<style scoped>
+.bg-app {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.denuncias-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.denuncias-header {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.denuncias-title {
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.denuncias-subtitle {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.denuncias-content {
+  padding: 20px;
+}
+
+.chart-section {
+  margin-bottom: 30px;
+}
+
+.chart-wrapper {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  height: 100%;
+}
+
+.chart-title {
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.form-section {
+  margin-bottom: 30px;
+}
+
+.list-section {
+  margin-bottom: 20px;
+}
+
+.badge {
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.table {
+  font-size: 0.9rem;
+}
+
+.table th {
+  font-weight: 500;
+  color: #555;
+}
+
+.card {
+  border: none;
+  border-radius: 8px;
+}
+
+.card-header {
+  border-radius: 8px 8px 0 0 !important;
+  font-weight: 500;
+}
+
+.btn-outline-primary {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.btn-outline-primary:hover {
+  background-color: #1890ff;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    height: 250px;
+  }
+}
+</style>

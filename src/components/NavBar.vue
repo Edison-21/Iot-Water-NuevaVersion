@@ -61,12 +61,10 @@ function toggleSidebar() {
 // Define los items del menú lateral
 const menuItems = [
   { name: "Dashboard",           path: "/dashboard",                  icon: "fas fa-tv" },
-  { name: "Gateway",             path: "/dashboard/gateway",           icon: "fas fa-plug" },
-  { name: "Usuario",             path: "/dashboard/usuario",           icon: "fas fa-user-plus" },
-  { name: "Medidor",             path: "/dashboard/medidor",           icon: "fas fa-tachometer-alt" },
-  { name: "Cliente",             path: "/dashboard/cliente",           icon: "fas fa-user-circle" },
-  { name: "CRM",                 path: "/dashboard/crm",               icon: "fas fa-chart-line" },
-  { name: "Denuncias",           path: "/dashboard/denuncias",         icon: "fas fa-exclamation-circle" },
+  { name: "CRM",             path: "/dashboard/gateway",           icon: "fas fa-plug" },
+  { name: "Mapa",             path: "/dashboard/usuario",           icon: "fas fa-user-plus" },
+  { name: "Denuncias Ciudadanas",             path: "/dashboard/medidor",           icon: "fas fa-tachometer-alt" },
+  { name: "Dispositivos",           path: "/dashboard/denuncias",         icon: "fas fa-exclamation-circle" },
   { name: "Gestión Problemas",   path: "/dashboard/gestion-problemas", icon: "fas fa-tools" },
   { name: "Personal",            path: "/dashboard/personal",          icon: "fas fa-user-friends" }
 ];
